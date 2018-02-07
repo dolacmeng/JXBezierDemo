@@ -50,7 +50,7 @@ static CGFloat minDisappearDistance = 150;
 
 //根据y值获取贝塞尔路径
 - (CGPathRef)getPathWithMoveDistance:(CGFloat)distance{
-
+    
     UIBezierPath *path = [UIBezierPath bezierPath];
     CGPoint startPoint = CGPointMake(0, 0);
     CGPoint controlPoint = CGPointMake(self.bounds.size.width*0.5, 60+distance);
@@ -72,7 +72,7 @@ static CGFloat minDisappearDistance = 150;
     if (ABS(distanceX) > ABS(distanceY)) {
         return;
     }
-    
+    //拖动过程
     if (gesture.state == UIGestureRecognizerStateChanged) {
         NSLog(@"%f",distanceY);
         
@@ -85,7 +85,7 @@ static CGFloat minDisappearDistance = 150;
             self.frame = CGRectMake(0, self.originY+distanceY-minMoveDistance, self.bounds.size.width, self.bounds.size.height);
         }
     }
-    
+    //手势结束
     if (gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled || gesture.state == UIGestureRecognizerStateFailed) {
         [self removeGestureRecognizer:self.gesture];
         [self revertFormY:distanceY];
@@ -102,7 +102,7 @@ static CGFloat minDisappearDistance = 150;
 //手势结束后恢复或隐藏
 -(void)revertFormY:(CGFloat)y{
     
-    //y位移 < 最小的隐藏位移距离，未发生位移，贝塞尔曲线恢复
+    //y < 最小的隐藏位移距离，未发生位移，贝塞尔曲线恢复
     if (y < minDisappearDistance) {
         CAKeyframeAnimation *vibrate = [CAKeyframeAnimation animationWithKeyPath:@"path"];
         vibrate.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
@@ -123,19 +123,21 @@ static CGFloat minDisappearDistance = 150;
         [self.topLineLayer addAnimation:vibrate forKey:nil];
     }
     
-    //y大于 > 最小位移距离，发生了位移，向上恢复或向下隐藏view
+    //y > 最小位移距离，发生了位移
     if(y > minMoveDistance){
         
         [UIView animateWithDuration:0.3 animations:^{
             CGFloat endY;
+            //向上恢复view
             if (y < minDisappearDistance) {
                 endY = self.originY;
-            }else{
+            }
+            //向下隐藏view
+            else{
                 endY = SCREEN_HEIGHT;
             }
             self.frame = CGRectMake(0, endY, SCREEN_WIDTH, self.frame.size.height);
         }];
-
     }
 }
 
@@ -160,3 +162,4 @@ static CGFloat minDisappearDistance = 150;
     [self addGesure];
 }
 @end
+
